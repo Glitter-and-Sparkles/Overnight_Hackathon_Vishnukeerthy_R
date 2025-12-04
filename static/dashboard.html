@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
+    <title>Analytics Dashboard - Behavioral Integrity Monitor</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
         }
 
         .sidebar {
-            background: #2c3e50;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
             color: white;
             padding: 20px;
         }
@@ -33,8 +33,31 @@
             font-size: 24px;
         }
 
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu li:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
         .main-content {
             padding: 30px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
         .stats-grid {
@@ -49,6 +72,12 @@
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         }
 
         .stat-card h3 {
@@ -62,6 +91,12 @@
             font-size: 36px;
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        .stat-card .trend {
+            font-size: 12px;
+            color: #4caf50;
+            margin-top: 5px;
         }
 
         .sessions-table {
@@ -89,28 +124,38 @@
             color: #333;
         }
 
+        tr:hover {
+            background: #f8f9fa;
+        }
+
         .risk-badge {
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
+            display: inline-block;
         }
 
         .risk-low { background: #d4edda; color: #155724; }
         .risk-medium { background: #fff3cd; color: #856404; }
-        .risk-high { background: #f8d7da; color: #721c24; }
+        .risk-high { background: #ffe0b2; color: #e65100; }
+        .risk-critical { 
+            background: #f8d7da; 
+            color: #721c24;
+            animation: pulse 1s infinite;
+        }
 
-        .flag-icon {
-            cursor: pointer;
-            font-size: 18px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         h1 {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #2c3e50;
         }
 
-        .refresh-btn {
+        .btn {
             background: #667eea;
             color: white;
             border: none;
@@ -118,14 +163,31 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-right: 10px;
+            transition: background 0.3s;
         }
 
-        .refresh-btn:hover {
+        .btn:hover {
             background: #5568d3;
         }
 
-        .details-modal {
+        .btn-danger {
+            background: #ff4757;
+        }
+
+        .btn-danger:hover {
+            background: #e84118;
+        }
+
+        .btn-success {
+            background: #4caf50;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -136,104 +198,214 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
             background: white;
             padding: 30px;
             border-radius: 10px;
-            max-width: 600px;
+            max-width: 700px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .close-modal {
             float: right;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: #999;
+            font-weight: bold;
         }
 
-        .event-list {
-            margin-top: 20px;
+        .close-modal:hover {
+            color: #333;
         }
 
-        .event-item {
-            padding: 10px;
-            border-left: 3px solid #667eea;
-            margin-bottom: 10px;
+        .report-section {
+            margin: 20px 0;
+            padding: 15px;
             background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .report-section h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .factor-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #ff9800;
+        }
+
+        .intervention-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #fff3cd;
+            border-radius: 5px;
+            border: 1px solid #ffc107;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .filter-section select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .status-locked {
+            color: #ff4757;
+            font-weight: bold;
+        }
+
+        .status-active {
+            color: #4caf50;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
         <div class="sidebar">
-            <h2>🛡️ Integrity Monitor</h2>
-            <p style="color: #95a5a6; font-size: 14px;">Real-time behavioral analytics for academic integrity</p>
+            <h2>🛡️ Integrity AI</h2>
+            <p style="color: #95a5a6; font-size: 14px; margin-bottom: 30px;">
+                Real-time behavioral analytics powered by ML
+            </p>
+            <ul class="sidebar-menu">
+                <li onclick="location.href='/assessment'">📝 Take Assessment</li>
+                <li style="background: rgba(255,255,255,0.1);">📊 Dashboard</li>
+                <li onclick="exportData()">💾 Export Data</li>
+            </ul>
         </div>
 
         <div class="main-content">
-            <h1>Analytics Dashboard</h1>
-            <button class="refresh-btn" onclick="loadDashboard()">🔄 Refresh Data</button>
+            <div class="header-section">
+                <div>
+                    <h1>Analytics Dashboard</h1>
+                    <p style="color: #666;">Real-time monitoring of assessment integrity</p>
+                </div>
+                <button class="btn" onclick="loadDashboard()">🔄 Refresh</button>
+            </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>Total Sessions</h3>
                     <div class="value" id="totalSessions">0</div>
+                    <div class="trend">↑ Active monitoring</div>
                 </div>
                 <div class="stat-card">
-                    <h3>High Risk</h3>
-                    <div class="value" id="highRisk" style="color: #e74c3c;">0</div>
+                    <h3>Critical Risk</h3>
+                    <div class="value" id="criticalRisk" style="color: #e74c3c;">0</div>
+                    <div class="trend" style="color: #e74c3c;">Requires immediate action</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Flags Raised</h3>
+                    <h3>Total Flags</h3>
                     <div class="value" id="totalFlags" style="color: #f39c12;">0</div>
+                    <div class="trend" style="color: #f39c12;">Suspicious activities</div>
                 </div>
                 <div class="stat-card">
                     <h3>Average Risk</h3>
                     <div class="value" id="avgRisk">0%</div>
+                    <div class="trend">Lower is better</div>
                 </div>
             </div>
 
+            <div class="filter-section">
+                <label>Filter by Risk:</label>
+                <select id="riskFilter" onchange="filterSessions()">
+                    <option value="all">All Sessions</option>
+                    <option value="critical">Critical Only</option>
+                    <option value="high">High Risk</option>
+                    <option value="medium">Medium Risk</option>
+                    <option value="low">Low Risk</option>
+                </select>
+                
+                <label>Status:</label>
+                <select id="statusFilter" onchange="filterSessions()">
+                    <option value="all">All Status</option>
+                    <option value="locked">Locked</option>
+                    <option value="active">Active</option>
+                </select>
+            </div>
+
             <div class="sessions-table">
-                <h2 style="margin-bottom: 20px;">Session Details</h2>
+                <h2 style="margin-bottom: 20px;">Session Monitor</h2>
                 <table id="sessionsTable">
                     <thead>
                         <tr>
                             <th>Session ID</th>
-                            <th>User ID</th>
-                            <th>Start Time</th>
-                            <th>Mouse Events</th>
-                            <th>Window Switches</th>
-                            <th>Paste Events</th>
+                            <th>User</th>
+                            <th>Started</th>
+                            <th>Events</th>
                             <th>Flags</th>
                             <th>Risk Score</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="sessionsBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px;">
+                                Loading sessions...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div class="details-modal" id="detailsModal">
+    <div class="modal" id="detailsModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2>Session Details</h2>
             <div id="modalContent"></div>
         </div>
     </div>
 
     <script>
         let sessionsData = {};
+        let allSessionsData = {};
 
         async function loadDashboard() {
             try {
                 const response = await fetch('http://localhost:5000/api/sessions');
-                sessionsData = await response.json();
+                allSessionsData = await response.json();
+                sessionsData = allSessionsData;
                 
                 updateStats();
                 updateTable();
@@ -246,107 +418,201 @@
             const sessions = Object.keys(sessionsData);
             document.getElementById('totalSessions').textContent = sessions.length;
 
-            let highRiskCount = 0;
+            let criticalCount = 0;
             let totalFlags = 0;
             let totalRisk = 0;
 
-            sessions.forEach(async (sessionId) => {
-                const response = await fetch(`http://localhost:5000/api/risk_score/${sessionId}`);
-                const data = await response.json();
-                
-                if (data.risk_score > 60) highRiskCount++;
-                totalFlags += data.flags.length;
-                totalRisk += data.risk_score;
+            sessions.forEach((sessionId) => {
+                const session = sessionsData[sessionId];
+                if (session.severity === 'critical') criticalCount++;
+                totalFlags += session.flags;
+                totalRisk += session.risk_score;
             });
 
-            setTimeout(() => {
-                document.getElementById('highRisk').textContent = highRiskCount;
-                document.getElementById('totalFlags').textContent = totalFlags;
-                document.getElementById('avgRisk').textContent = 
-                    sessions.length > 0 ? Math.round(totalRisk / sessions.length) + '%' : '0%';
-            }, 500);
+            document.getElementById('criticalRisk').textContent = criticalCount;
+            document.getElementById('totalFlags').textContent = totalFlags;
+            document.getElementById('avgRisk').textContent = 
+                sessions.length > 0 ? Math.round(totalRisk / sessions.length) + '%' : '0%';
         }
 
         async function updateTable() {
             const tbody = document.getElementById('sessionsBody');
             tbody.innerHTML = '';
 
-            for (const [sessionId, session] of Object.entries(sessionsData)) {
-                const response = await fetch(`http://localhost:5000/api/risk_score/${sessionId}`);
-                const riskData = await response.json();
+            const sessions = Object.entries(sessionsData);
+            
+            if (sessions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No sessions found</td></tr>';
+                return;
+            }
 
+            for (const [sessionId, session] of sessions) {
                 const row = document.createElement('tr');
+                
+                const statusClass = session.locked ? 'status-locked' : 'status-active';
+                const statusText = session.locked ? '🔒 LOCKED' : '✅ Active';
+                
+                const eventCount = session.event_counts.mouse + 
+                                 session.event_counts.keyboard + 
+                                 session.event_counts.window + 
+                                 session.event_counts.paste;
+                
                 row.innerHTML = `
-                    <td>${sessionId.substring(0, 12)}...</td>
-                    <td>${session.user_id}</td>
-                    <td>${new Date(session.start_time).toLocaleString()}</td>
-                    <td>${session.event_counts.mouse}</td>
-                    <td>${session.event_counts.window}</td>
-                    <td>${session.event_counts.paste}</td>
-                    <td><span class="flag-icon">${session.flags > 0 ? '🚩' : '✅'}</span> ${session.flags}</td>
-                    <td><span class="risk-badge risk-${riskData.risk_level}">${riskData.risk_score}</span></td>
-                    <td><button onclick="viewDetails('${sessionId}')">View</button></td>
+                    <td>${sessionId.substring(0, 10)}...</td>
+                    <td>${session.user_id.substring(0, 15)}</td>
+                    <td>${new Date(session.start_time).toLocaleTimeString()}</td>
+                    <td>${eventCount}</td>
+                    <td><span style="color: ${session.flags > 0 ? '#ff4757' : '#4caf50'}">
+                        ${session.flags > 0 ? '🚩' : '✅'} ${session.flags}
+                    </span></td>
+                    <td><span class="risk-badge risk-${session.severity}">
+                        ${Math.round(session.risk_score)}
+                    </span></td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>
+                        <button class="btn" onclick="viewDetails('${sessionId}')">View</button>
+                        ${session.locked ? 
+                            `<button class="btn btn-success" onclick="unlockSession('${sessionId}')">Unlock</button>` :
+                            `<button class="btn btn-danger" onclick="lockSession('${sessionId}')">Lock</button>`
+                        }
+                    </td>
                 `;
                 tbody.appendChild(row);
             }
         }
 
         async function viewDetails(sessionId) {
-            const response = await fetch(`http://localhost:5000/api/risk_score/${sessionId}`);
-            const data = await response.json();
+            try {
+                const reportResponse = await fetch(`http://localhost:5000/api/report/${sessionId}`);
+                const report = await reportResponse.json();
 
-            const modal = document.getElementById('detailsModal');
-            const content = document.getElementById('modalContent');
+                const modal = document.getElementById('detailsModal');
+                const content = document.getElementById('modalContent');
 
-            let html = `
-                <div style="margin: 20px 0;">
-                    <h3>Risk Assessment</h3>
-                    <p><strong>Risk Score:</strong> <span class="risk-badge risk-${data.risk_level}">${data.risk_score}</span></p>
-                    <p><strong>Risk Level:</strong> ${data.risk_level.toUpperCase()}</p>
-                </div>
+                let html = `
+                    <h2>📊 Detailed Integrity Report</h2>
+                    
+                    <div class="report-section">
+                        <h3>Risk Assessment</h3>
+                        <p><strong>Risk Score:</strong> <span class="risk-badge risk-${report.severity}">
+                            ${Math.round(report.risk_score)}
+                        </span></p>
+                        <p><strong>Severity:</strong> ${report.severity.toUpperCase()}</p>
+                        <p><strong>Verdict:</strong> ${report.verdict}</p>
+                    </div>
 
-                <div class="event-list">
-                    <h3>Risk Factors</h3>
-            `;
+                    <div class="report-section">
+                        <h3>Risk Factors Detected</h3>
+                `;
 
-            if (data.risk_factors.length > 0) {
-                data.risk_factors.forEach(factor => {
-                    html += `<div class="event-item">⚠️ ${factor}</div>`;
+                if (report.summary && report.summary.length > 0) {
+                    report.summary.forEach(factor => {
+                        html += `<div class="factor-item">⚠️ ${factor}</div>`;
+                    });
+                } else {
+                    html += `<p style="color: #4caf50;">✅ No significant risk factors detected</p>`;
+                }
+
+                html += `</div>`;
+
+                // Analysis Details
+                html += `
+                    <div class="report-section">
+                        <h3>ML Analysis Breakdown</h3>
+                        <p><strong>Window Behavior Score:</strong> ${report.detailed_metrics.window_score}</p>
+                        <p><strong>Paste Detection Score:</strong> ${report.detailed_metrics.paste_score}</p>
+                        <p><strong>Typing Pattern Score:</strong> ${report.detailed_metrics.typing_score}</p>
+                        <p><strong>Mouse Behavior Score:</strong> ${report.detailed_metrics.mouse_score}</p>
+                        <p><strong>Temporal Analysis Score:</strong> ${report.detailed_metrics.temporal_score}</p>
+                    </div>
+                `;
+
+                // Recommendations
+                html += `
+                    <div class="report-section">
+                        <h3>Recommendations</h3>
+                `;
+                report.recommendations.forEach(rec => {
+                    html += `<div class="intervention-item">💡 ${rec}</div>`;
                 });
-            } else {
-                html += `<div class="event-item">✅ No risk factors detected</div>`;
+                html += `</div>`;
+
+                content.innerHTML = html;
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error loading details:', error);
+                alert('Error loading session details');
             }
+        }
 
-            html += `</div><div class="event-list"><h3>Flags</h3>`;
+        async function lockSession(sessionId) {
+            if (!confirm('Are you sure you want to lock this assessment?')) return;
+            
+            await fetch(`http://localhost:5000/api/intervention/${sessionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'lock' })
+            });
+            
+            loadDashboard();
+        }
 
-            if (data.flags.length > 0) {
-                data.flags.forEach(flag => {
-                    html += `
-                        <div class="event-item">
-                            <strong>${flag.type}</strong><br>
-                            Time: ${new Date(flag.timestamp).toLocaleString()}<br>
-                            Severity: ${flag.severity}
-                        </div>
-                    `;
-                });
-            } else {
-                html += `<div class="event-item">✅ No flags raised</div>`;
+        async function unlockSession(sessionId) {
+            if (!confirm('Unlock this assessment?')) return;
+            
+            await fetch(`http://localhost:5000/api/intervention/${sessionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'unlock' })
+            });
+            
+            loadDashboard();
+        }
+
+        function filterSessions() {
+            const riskFilter = document.getElementById('riskFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filtered = { ...allSessionsData };
+            
+            if (riskFilter !== 'all') {
+                filtered = Object.fromEntries(
+                    Object.entries(filtered).filter(([_, session]) => 
+                        session.severity === riskFilter
+                    )
+                );
             }
-
-            html += `</div>`;
-
-            content.innerHTML = html;
-            modal.style.display = 'flex';
+            
+            if (statusFilter === 'locked') {
+                filtered = Object.fromEntries(
+                    Object.entries(filtered).filter(([_, session]) => session.locked)
+                );
+            } else if (statusFilter === 'active') {
+                filtered = Object.fromEntries(
+                    Object.entries(filtered).filter(([_, session]) => !session.locked)
+                );
+            }
+            
+            sessionsData = filtered;
+            updateStats();
+            updateTable();
         }
 
         function closeModal() {
             document.getElementById('detailsModal').style.display = 'none';
         }
 
-        // Auto-refresh every 5 seconds
-        setInterval(loadDashboard, 5000);
+        function exportData() {
+            const dataStr = JSON.stringify(allSessionsData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'integrity-report-' + new Date().toISOString() + '.json';
+            link.click();
+        }
 
-        // Initial load
+        setInterval(loadDashboard, 10000);
         loadDashboard();
     </script>
 </body>
