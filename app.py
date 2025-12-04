@@ -3,18 +3,33 @@ from flask_cors import CORS
 from datetime import datetime
 import json
 import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from detector import BehavioralDetector
 
 app = Flask(__name__)
 CORS(app)
 
-# Store behavioral data in memory (use JSON file for persistence)
+detector = BehavioralDetector()
+
+# Store behavioral data
 DATA_FILE = 'behavioral_data.json'
 sessions = {}
 
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as f:
-            return json.load(f)
+            data = json.load(f)
+            
+            for session_id, session in data.items():
+                if 'interventions' not in session:
+                    session['interventions'] = []
+                if 'locked' not in session:
+                    session['locked'] = False
+                if 'copy_events' not in session:
+                    session['copy_events'] = []
+            return data
     return {}
 
 def save_data():
@@ -41,14 +56,18 @@ def start_session():
     session_id = data.get('session_id', str(datetime.now().timestamp()))
     
     sessions[session_id] = {
+        'session_id': session_id,
         'start_time': datetime.now().isoformat(),
         'user_id': data.get('user_id', 'anonymous'),
         'mouse_events': [],
         'keyboard_events': [],
         'window_events': [],
         'paste_events': [],
+        'copy_events': [],
         'risk_scores': [],
-        'flags': []
+        'flags': [],
+        'interventions': [],
+        'locked': False
     }
     
     save_data()
@@ -64,7 +83,7 @@ def track_mouse():
             'timestamp': datetime.now().isoformat(),
             'x': data.get('x'),
             'y': data.get('y'),
-            'type': data.get('type')  # move, click, scroll
+            'type': data.get('type')
         })
         save_data()
         return jsonify({'status': 'recorded'})
@@ -96,12 +115,12 @@ def track_window():
     if session_id in sessions:
         event = {
             'timestamp': datetime.now().isoformat(),
-            'event_type': data.get('event_type'),  # blur, focus
+            'event_type': data.get('event_type'),
             'duration': data.get('duration')
         }
         sessions[session_id]['window_events'].append(event)
         
-        # Flag suspicious window switching
+        # Flag window switching
         if data.get('event_type') == 'blur':
             sessions[session_id]['flags'].append({
                 'type': 'window_switch',
@@ -110,7 +129,14 @@ def track_window():
             })
         
         save_data()
-        return jsonify({'status': 'recorded'})
+        
+        # Check if intervention needed
+        risk_data = get_ml_risk_score(session_id)
+        return jsonify({
+            'status': 'recorded',
+            'risk_score': risk_data['risk_score'],
+            'interventions': risk_data.get('interventions', [])
+        })
     
     return jsonify({'error': 'Invalid session'}), 400
 
@@ -126,7 +152,6 @@ def track_paste():
         }
         sessions[session_id]['paste_events'].append(event)
         
-        # Flag paste event
         sessions[session_id]['flags'].append({
             'type': 'paste_detected',
             'timestamp': datetime.now().isoformat(),
@@ -135,56 +160,120 @@ def track_paste():
         })
         
         save_data()
-        return jsonify({'status': 'recorded', 'warning': 'Paste detected'})
+        
+        # Check if intervention needed
+        risk_data = get_ml_risk_score(session_id)
+        return jsonify({
+            'status': 'recorded',
+            'warning': 'Paste detected',
+            'risk_score': risk_data['risk_score'],
+            'interventions': risk_data.get('interventions', [])
+        })
     
     return jsonify({'error': 'Invalid session'}), 400
+
+@app.route('/api/track/copy', methods=['POST'])
+def track_copy():
+    data = request.json
+    session_id = data.get('session_id')
+    
+    if session_id in sessions:
+        event = {
+            'timestamp': datetime.now().isoformat(),
+            'length': data.get('length', 0)
+        }
+        sessions[session_id]['copy_events'].append(event)
+        
+        sessions[session_id]['flags'].append({
+            'type': 'copy_detected',
+            'timestamp': datetime.now().isoformat(),
+            'severity': 'low'
+        })
+        
+        save_data()
+        return jsonify({'status': 'recorded'})
+    
+    return jsonify({'error': 'Invalid session'}), 400
+
+def get_ml_risk_score(session_id):
+    """Get ML-based risk score"""
+    if session_id not in sessions:
+        return {'risk_score': 0, 'severity': 'low'}
+    
+    session = sessions[session_id]
+    
+   
+    risk_analysis = detector.calculate_risk_score(session)
+    
+    # Check for interventions
+    interventions = detector.should_intervene(
+        risk_analysis['risk_score'],
+        risk_analysis['severity']
+    )
+    
+    # Ensure interventions key exists for previous ssessions
+    if 'interventions' not in session:
+        session['interventions'] = []
+    
+    # Store interventions
+    if interventions:
+        for intervention in interventions:
+            if intervention not in session['interventions']:
+                session['interventions'].append(intervention)
+                
+                # Lock session if suspicious
+                if intervention.get('action') == 'immediate_lock':
+                    session['locked'] = True
+    
+    save_data()
+    
+    return {
+        'risk_score': risk_analysis['risk_score'],
+        'severity': risk_analysis['severity'],
+        'risk_factors': risk_analysis['risk_factors'],
+        'interventions': interventions,
+        'locked': session['locked']
+    }
 
 @app.route('/api/risk_score/<session_id>', methods=['GET'])
 def get_risk_score(session_id):
     if session_id not in sessions:
         return jsonify({'error': 'Invalid session'}), 400
     
-    session = sessions[session_id]
-    
-    # Simple rule-based risk calculation
-    risk_score = 0
-    risk_factors = []
-    
-    # Window switching penalty
-    window_switches = len([e for e in session['window_events'] if e['event_type'] == 'blur'])
-    if window_switches > 3:
-        risk_score += 30
-        risk_factors.append(f'Excessive window switching ({window_switches} times)')
-    elif window_switches > 0:
-        risk_score += 10 * window_switches
-    
-    # Paste detection penalty
-    paste_count = len(session['paste_events'])
-    if paste_count > 0:
-        risk_score += 40 * paste_count
-        risk_factors.append(f'Paste detected ({paste_count} times)')
-    
-    # Mouse inactivity (too few movements might indicate automation)
-    mouse_events = len(session['mouse_events'])
-    if mouse_events < 10:
-        risk_score += 20
-        risk_factors.append('Suspiciously low mouse activity')
-    
-    # Cap risk score at 100
-    risk_score = min(risk_score, 100)
+    risk_data = get_ml_risk_score(session_id)
     
     return jsonify({
         'session_id': session_id,
-        'risk_score': risk_score,
-        'risk_level': 'high' if risk_score > 60 else 'medium' if risk_score > 30 else 'low',
-        'risk_factors': risk_factors,
-        'flags': session['flags']
+        'risk_score': risk_data['risk_score'],
+        'severity': risk_data['severity'],
+        'risk_level': risk_data['severity'], 
+        'risk_factors': risk_data.get('risk_factors', []),
+        'flags': sessions[session_id]['flags'],
+        'interventions': risk_data.get('interventions', []),
+        'locked': risk_data.get('locked', False)
     })
+
+@app.route('/api/report/<session_id>', methods=['GET'])
+def get_report(session_id):
+    """Generate detailed integrity report"""
+    if session_id not in sessions:
+        return jsonify({'error': 'Invalid session'}), 400
+    
+    session = sessions[session_id]
+    risk_analysis = detector.calculate_risk_score(session)
+    report = detector.generate_report(session, risk_analysis)
+    
+    return jsonify(report)
 
 @app.route('/api/sessions', methods=['GET'])
 def get_sessions():
+    print(f"DEBUG: Total sessions in memory: {len(sessions)}")
     session_summary = {}
     for sid, data in sessions.items():
+        # Get risk score
+        risk_data = get_ml_risk_score(sid)
+        print(f"DEBUG: Session {sid[:10]} - Risk: {risk_data['risk_score']}, Severity: {risk_data['severity']}")
+        
         session_summary[sid] = {
             'user_id': data['user_id'],
             'start_time': data['start_time'],
@@ -192,11 +281,42 @@ def get_sessions():
                 'mouse': len(data['mouse_events']),
                 'keyboard': len(data['keyboard_events']),
                 'window': len(data['window_events']),
-                'paste': len(data['paste_events'])
+                'paste': len(data['paste_events']),
+                'copy': len(data.get('copy_events', []))
             },
-            'flags': len(data['flags'])
+            'flags': len(data['flags']),
+            'risk_score': risk_data['risk_score'],
+            'severity': risk_data['severity'],
+            'locked': data.get('locked', False)
         }
     return jsonify(session_summary)
+
+@app.route('/api/intervention/<session_id>', methods=['POST'])
+def manual_intervention(session_id):
+    """Allow admin to manually intervene"""
+    if session_id not in sessions:
+        return jsonify({'error': 'Invalid session'}), 400
+    
+    data = request.json
+    action = data.get('action')
+    
+    if action == 'unlock':
+        sessions[session_id]['locked'] = False
+        sessions[session_id]['interventions'].append({
+            'type': 'manual_unlock',
+            'message': 'Manually unlocked by admin',
+            'timestamp': datetime.now().isoformat()
+        })
+    elif action == 'lock':
+        sessions[session_id]['locked'] = True
+        sessions[session_id]['interventions'].append({
+            'type': 'manual_lock',
+            'message': 'Manually locked by admin',
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    save_data()
+    return jsonify({'status': 'success', 'locked': sessions[session_id]['locked']})
 
 if __name__ == '__main__':
     os.makedirs('static', exist_ok=True)
