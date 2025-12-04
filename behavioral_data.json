@@ -1,0 +1,354 @@
+{
+  "1764872814.292509": {
+    "start_time": "2025-12-04T23:56:54.292580",
+    "user_id": "test_user_1764872814285",
+    "mouse_events": [
+      {
+        "timestamp": "2025-12-04T23:56:55.771087",
+        "x": 402,
+        "y": 219,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:56:59.818023",
+        "x": 642,
+        "y": 212,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:07.366999",
+        "x": 582,
+        "y": 124,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:08.260097",
+        "x": 325,
+        "y": 343,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:09.160642",
+        "x": 997,
+        "y": 397,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:09.597709",
+        "x": 812,
+        "y": 438,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:14.872355",
+        "x": 714,
+        "y": 446,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:15.185189",
+        "x": 322,
+        "y": 445,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:16.835622",
+        "x": 209,
+        "y": 447,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:24.632509",
+        "x": 479,
+        "y": 410,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:28.290649",
+        "x": 508,
+        "y": 491,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:57:29.239747",
+        "x": 510,
+        "y": 504,
+        "type": "move"
+      }
+    ],
+    "keyboard_events": [
+      {
+        "timestamp": "2025-12-04T23:57:01.329075",
+        "key_count": 10,
+        "typing_speed": 71,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:02.265333",
+        "key_count": 20,
+        "typing_speed": 79,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:03.465936",
+        "key_count": 30,
+        "typing_speed": 23,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:04.532823",
+        "key_count": 40,
+        "typing_speed": 180,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:05.202767",
+        "key_count": 50,
+        "typing_speed": 73,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:10.804214",
+        "key_count": 60,
+        "typing_speed": 1,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:11.848258",
+        "key_count": 70,
+        "typing_speed": 173,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:12.313818",
+        "key_count": 80,
+        "typing_speed": 93,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:13.389831",
+        "key_count": 90,
+        "typing_speed": 55,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:16.334092",
+        "key_count": 100,
+        "typing_speed": 2379,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:26.003841",
+        "key_count": 110,
+        "typing_speed": 5,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:57:27.087416",
+        "key_count": 120,
+        "typing_speed": 71,
+        "backspace_count": 0
+      }
+    ],
+    "window_events": [
+      {
+        "timestamp": "2025-12-04T23:57:32.414335",
+        "event_type": "blur",
+        "duration": 37798
+      },
+      {
+        "timestamp": "2025-12-04T23:57:32.741412",
+        "event_type": "blur",
+        "duration": 573
+      }
+    ],
+    "paste_events": [
+      {
+        "timestamp": "2025-12-04T23:57:19.506524",
+        "length": 37
+      }
+    ],
+    "risk_scores": [],
+    "flags": [
+      {
+        "type": "paste_detected",
+        "timestamp": "2025-12-04T23:57:19.506548",
+        "severity": "high",
+        "length": 37
+      },
+      {
+        "type": "window_switch",
+        "timestamp": "2025-12-04T23:57:32.414370",
+        "severity": "medium"
+      },
+      {
+        "type": "window_switch",
+        "timestamp": "2025-12-04T23:57:32.741428",
+        "severity": "medium"
+      }
+    ]
+  },
+  "1764872913.130343": {
+    "start_time": "2025-12-04T23:58:33.130353",
+    "user_id": "test_user_1764872913015",
+    "mouse_events": [
+      {
+        "timestamp": "2025-12-04T23:58:45.447456",
+        "x": 563,
+        "y": 326,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:58:46.294265",
+        "x": 302,
+        "y": 361,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:58:50.823961",
+        "x": 406,
+        "y": 300,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:58:56.617851",
+        "x": 856,
+        "y": 15,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:59:22.499954",
+        "x": 925,
+        "y": 289,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:59:23.647061",
+        "x": 901,
+        "y": 393,
+        "type": "move"
+      },
+      {
+        "timestamp": "2025-12-04T23:59:28.729623",
+        "x": 826,
+        "y": 549,
+        "type": "move"
+      }
+    ],
+    "keyboard_events": [
+      {
+        "timestamp": "2025-12-04T23:58:41.721631",
+        "key_count": 10,
+        "typing_speed": 116,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:58:42.564020",
+        "key_count": 20,
+        "typing_speed": 13,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:58:43.012115",
+        "key_count": 30,
+        "typing_speed": 132,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:58:43.918828",
+        "key_count": 40,
+        "typing_speed": 54,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:16.293650",
+        "key_count": 50,
+        "typing_speed": 335,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:18.017559",
+        "key_count": 60,
+        "typing_speed": 46,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:19.072732",
+        "key_count": 70,
+        "typing_speed": 78,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:19.788502",
+        "key_count": 80,
+        "typing_speed": 2,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:24.208064",
+        "key_count": 90,
+        "typing_speed": 172,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:25.132905",
+        "key_count": 100,
+        "typing_speed": 22,
+        "backspace_count": 0
+      },
+      {
+        "timestamp": "2025-12-04T23:59:26.420170",
+        "key_count": 110,
+        "typing_speed": 366,
+        "backspace_count": 0
+      }
+    ],
+    "window_events": [
+      {
+        "timestamp": "2025-12-04T23:58:58.799767",
+        "event_type": "blur",
+        "duration": 25530
+      },
+      {
+        "timestamp": "2025-12-04T23:59:33.214147",
+        "event_type": "blur",
+        "duration": 32270
+      },
+      {
+        "timestamp": "2025-12-04T23:59:33.476742",
+        "event_type": "blur",
+        "duration": 379
+      }
+    ],
+    "paste_events": [
+      {
+        "timestamp": "2025-12-04T23:58:49.547874",
+        "length": 40
+      }
+    ],
+    "risk_scores": [],
+    "flags": [
+      {
+        "type": "paste_detected",
+        "timestamp": "2025-12-04T23:58:49.547907",
+        "severity": "high",
+        "length": 40
+      },
+      {
+        "type": "window_switch",
+        "timestamp": "2025-12-04T23:58:58.799788",
+        "severity": "medium"
+      },
+      {
+        "type": "window_switch",
+        "timestamp": "2025-12-04T23:59:33.214181",
+        "severity": "medium"
+      },
+      {
+        "type": "window_switch",
+        "timestamp": "2025-12-04T23:59:33.476771",
+        "severity": "medium"
+      }
+    ]
+  }
+}

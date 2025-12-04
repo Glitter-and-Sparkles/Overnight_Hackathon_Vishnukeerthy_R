@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Assessment - Behavioral Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .session-info {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .risk-indicator {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .tracking-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .tracking-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Online Assessment</h1>
+            <p>Answer the questions below. Your session is monitored for academic integrity.</p>
+        </div>
+
+        <div class="session-info">
+            <div>
+                <strong>Session ID:</strong> <span id="sessionId">Initializing...</span>
+            </div>
+            <div>
+                <strong>Risk Level:</strong> 
+                <span id="riskLevel" class="risk-indicator risk-low">Low</span>
+            </div>
+        </div>
+
+        <div id="warning" class="warning"></div>
+
+        <form id="assessmentForm">
+            <div class="question">
+                <h3>Question 1: What is Machine Learning?</h3>
+                <textarea name="q1" placeholder="Type your answer here..." required></textarea>
+            </div>
+
+            <div class="question">
+                <h3>Question 2: Explain the difference between supervised and unsupervised learning.</h3>
+                <textarea name="q2" placeholder="Type your answer here..." required></textarea>
+            </div>
+
+            <div class="question">
+                <h3>Question 3: What are neural networks?</h3>
+                <textarea name="q3" placeholder="Type your answer here..." required></textarea>
+            </div>
+
+            <div class="question">
+                <h3>Question 4: Your Name</h3>
+                <input type="text" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Assessment</button>
+        </form>
+    </div>
+
+    <div class="tracking-status">
+        <span class="tracking-dot"></span> Behavioral tracking active
+    </div>
+
+    <script>
+        let sessionId = null;
+        let mouseEventBuffer = [];
+        let keyCount = 0;
+        let backspaceCount = 0;
+        let lastKeyTime = Date.now();
+        let focusTime = Date.now();
+
+        // Initialize session
+        async function initSession() {
+            const response = await fetch('http://localhost:5000/api/session/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: 'test_user_' + Date.now() })
+            });
+            const data = await response.json();
+            sessionId = data.session_id;
+            document.getElementById('sessionId').textContent = sessionId.substring(0, 12) + '...';
+        }
+
+        // Track mouse movements
+        document.addEventListener('mousemove', (e) => {
+            mouseEventBuffer.push({
+                session_id: sessionId,
+                x: e.clientX,
+                y: e.clientY,
+                type: 'move'
+            });
+
+            // Send in batches every 2 seconds
+            if (mouseEventBuffer.length >= 20) {
+                sendMouseData();
+            }
+        });
+
+        async function sendMouseData() {
+            if (mouseEventBuffer.length === 0 || !sessionId) return;
+            
+            const event = mouseEventBuffer[mouseEventBuffer.length - 1];
+            mouseEventBuffer = [];
+            
+            await fetch('http://localhost:5000/api/track/mouse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(event)
+            });
+        }
+
+        // Track keyboard activity
+        document.addEventListener('keydown', async (e) => {
+            keyCount++;
+            if (e.key === 'Backspace') backspaceCount++;
+
+            const now = Date.now();
+            const timeDiff = now - lastKeyTime;
+            lastKeyTime = now;
+
+            // Send keyboard metrics every 10 keys
+            if (keyCount % 10 === 0 && sessionId) {
+                await fetch('http://localhost:5000/api/track/keyboard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        key_count: keyCount,
+                        typing_speed: timeDiff,
+                        backspace_count: backspaceCount
+                    })
+                });
+            }
+        });
+
+        // Track window focus/blur
+        window.addEventListener('blur', async () => {
+            if (!sessionId) return;
+            const duration = Date.now() - focusTime;
+            
+            await fetch('http://localhost:5000/api/track/window', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    event_type: 'blur',
+                    duration: duration
+                })
+            });
+
+            showWarning('⚠️ Warning: You switched windows! This has been logged.');
+            updateRiskScore();
+        });
+
+        window.addEventListener('focus', () => {
+            focusTime = Date.now();
+        });
+
+        // Track paste events
+        document.addEventListener('paste', async (e) => {
+            if (!sessionId) return;
+            const pastedText = e.clipboardData.getData('text');
+            
+            const response = await fetch('http://localhost:5000/api/track/paste', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    length: pastedText.length
+                })
+            });
+
+            showWarning('🚨 Alert: Paste operation detected! This may affect your integrity score.');
+            updateRiskScore();
+        });
+
+        // Update risk score
+        async function updateRiskScore() {
+            if (!sessionId) return;
+            
+            const response = await fetch(`http://localhost:5000/api/risk_score/${sessionId}`);
+            const data = await response.json();
+            
+            const riskLevel = document.getElementById('riskLevel');
+            riskLevel.textContent = data.risk_level.toUpperCase() + ' (' + data.risk_score + ')';
+            riskLevel.className = 'risk-indicator risk-' + data.risk_level;
+        }
+
+        function showWarning(message) {
+            const warning = document.getElementById('warning');
+            warning.textContent = message;
+            warning.style.display = 'block';
+            
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 5000);
+        }
+
+        // Form submission
+        document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            await sendMouseData();
+            await updateRiskScore();
+            
+            alert('Assessment submitted! Check the dashboard to see your behavioral analytics.');
+            window.location.href = '/dashboard';
+        });
+
+        // Periodic risk score update
+        setInterval(updateRiskScore, 5000);
+
+        // Initialize on load
+        initSession();
+    </script>
+</body>
+</html>
