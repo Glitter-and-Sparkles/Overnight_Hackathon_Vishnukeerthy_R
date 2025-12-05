@@ -21,7 +21,6 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Background: Deep Space Blue to Ink Black */
             background: linear-gradient(135deg, #003554 0%, #051923 100%);
             min-height: 100vh;
             display: flex;
@@ -33,17 +32,16 @@
         .login-container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5); /* Slightly darker shadow for contrast */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             overflow: hidden;
             max-width: 900px;
             width: 100%;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* Ensures two equal columns */
         }
 
         .login-left {
-            /* Gradient: Steel Blue to Baltic Blue */
-            background: linear-gradient(135deg, #0582CA 0%, #006494 100%);
+            background: #0582cf;
             color: white;
             padding: 60px 40px;
             display: flex;
@@ -82,7 +80,7 @@
         }
 
         .login-right h2 {
-            color: #051923; /* Ink Black */
+            color: #051923;
             margin-bottom: 30px;
             font-size: 28px;
         }
@@ -104,13 +102,13 @@
         }
 
         .role-card:hover {
-            border-color: #00A6FB; /* Fresh Sky */
-            background: #f0fbff; /* Very light tint of Fresh Sky */
+            border-color: #00A6FB;
+            background: #f0fbff;
         }
 
         .role-card.active {
-            border-color: #0582CA; /* Steel Blue */
-            background: #0582CA;  /* Steel Blue */
+            border-color: #0582CA;
+            background: #0582CA;
             color: white;
         }
 
@@ -136,7 +134,7 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #003554; /* Deep Space Blue */
+            color: #003554;
             font-weight: 500;
         }
 
@@ -151,13 +149,12 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #00A6FB; /* Fresh Sky */
+            border-color: #00A6FB;
         }
 
         .login-btn {
             width: 100%;
             padding: 15px;
-            /* Gradient: Fresh Sky to Baltic Blue */
             background: linear-gradient(135deg, #00A6FB 0%, #006494 100%);
             color: white;
             border: none;
@@ -170,7 +167,6 @@
 
         .login-btn:hover {
             transform: translateY(-2px);
-            /* Glow using Fresh Sky */
             box-shadow: 0 5px 20px rgba(0, 166, 251, 0.4);
         }
 
@@ -185,12 +181,12 @@
             background: #f8f9fa;
             border-radius: 8px;
             font-size: 14px;
-            border-left: 4px solid #006494; /* Baltic Blue accent */
+            border-left: 4px solid #006494;
         }
 
         .demo-credentials h4 {
             margin-bottom: 10px;
-            color: #006494; /* Baltic Blue */
+            color: #006494;
         }
 
         .demo-credentials p {
@@ -229,20 +225,20 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="login-left"><div style="margin-bottom: 30px;">
-        <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M75 35 C 75 25, 68 20, 60 20 C 50 20, 48 30, 52 45 L 62 80 C 66 95, 62 105, 50 105 C 40 105, 35 95, 38 85 C 39 82, 36 80, 33 82 C 30 85, 28 95, 35 108 C 42 120, 60 120, 72 105 L 82 70 C 86 55, 90 45, 88 35 C 87 30, 82 28, 80 30" 
-                  fill="white" />
+        <div class="login-left">
+            <div style="margin-bottom: 0px;">
+                <img src="https://i.ibb.co/N2Yd7DLr/iiTY.png" 
+                     alt="IntegRitty Logo" 
+                     style="max-width: 250px; width: 100%; height: auto; display: block;">
+            </div>
+
+            <h1 style="margin-top: 0; font-size: 36px; margin-bottom: 10px;">
+                IntegRitty
+            </h1>
             
-            <text x="85" y="95" 
-                  font-family="'Brush Script MT', 'Segoe Script', 'Lucas Handwriting', cursive" 
-                  font-size="80" 
-                  fill="white"
-                  style="text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">itty</text>
-        </svg>
-    </div>
-            <h1>Integritty</h1>
-            <p>Behavioral analytics for maintaining academic integrity in online assessments.</p>
+            <p style="font-size: 18px; opacity: 0.9; margin-bottom: 30px;">
+                Behavioral analytics for maintaining academic integrity in online assessments.
+            </p>
             
             <ul class="feature-list">
                 <li>✓ Real-time behavioral monitoring</li>
@@ -287,8 +283,8 @@
 
             <div class="demo-credentials">
                 <h4>Demo Credentials:</h4>
-                <p><strong>Student:</strong> Vedika / vedika123</p>
-                <p><strong>Proctor:</strong> Vishnukeerthy / vkr123</p>
+                <p><strong>Student:</strong> student / password</p>
+                <p><strong>Proctor:</strong> proctor / admin123</p>
             </div>
         </div>
     </div>
@@ -337,12 +333,9 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Store user info in localStorage
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    
                     showAlert('success', 'Login successful! Redirecting...');
                     
-                    // Redirect based on role
                     setTimeout(() => {
                         if (data.user.role === 'proctor') {
                             window.location.href = '/dashboard';
