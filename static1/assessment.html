@@ -206,8 +206,7 @@
 
         // Initialize session
         async function initSession() {
-            // UPDATED: Removed http://localhost:5000
-            const response = await fetch('/api/session/start', {
+            const response = await fetch('http://localhost:5000/api/session/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: 'test_user_' + Date.now() })
@@ -238,8 +237,7 @@
             const event = mouseEventBuffer[mouseEventBuffer.length - 1];
             mouseEventBuffer = [];
             
-            // UPDATED: Removed http://localhost:5000
-            await fetch('/api/track/mouse', {
+            await fetch('http://localhost:5000/api/track/mouse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(event)
@@ -257,8 +255,7 @@
 
             // Send keyboard metrics every 10 keys
             if (keyCount % 10 === 0 && sessionId) {
-                // UPDATED: Removed http://localhost:5000
-                await fetch('/api/track/keyboard', {
+                await fetch('http://localhost:5000/api/track/keyboard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -276,8 +273,7 @@
             if (!sessionId) return;
             const duration = Date.now() - focusTime;
             
-            // UPDATED: Removed http://localhost:5000
-            await fetch('/api/track/window', {
+            await fetch('http://localhost:5000/api/track/window', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -300,8 +296,7 @@
             if (!sessionId) return;
             const pastedText = e.clipboardData.getData('text');
             
-            // UPDATED: Removed http://localhost:5000
-            const response = await fetch('/api/track/paste', {
+            const response = await fetch('http://localhost:5000/api/track/paste', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -318,8 +313,7 @@
         async function updateRiskScore() {
             if (!sessionId) return;
             
-            // UPDATED: Removed http://localhost:5000
-            const response = await fetch(`/api/risk_score/${sessionId}`);
+            const response = await fetch(`http://localhost:5000/api/risk_score/${sessionId}`);
             const data = await response.json();
             
             const riskLevel = document.getElementById('riskLevel');

@@ -269,7 +269,7 @@
 <body>
     <div class="dashboard">
         <div class="sidebar">
-            <h2>Integritty</h2>
+            <h2></h2>Integritty</h2>
             <p style="color: #95a5a6; font-size: 14px; margin-bottom: 10px;">
                 Real-time behavioral analytics powered by ML
             </p>
@@ -399,8 +399,7 @@
             if (!checkAuth()) return;
             
             try {
-                // UPDATED: Removed http://localhost:5000
-                const response = await fetch('/api/sessions');
+                const response = await fetch('http://localhost:5000/api/sessions');
                 allSessionsData = await response.json();
                 sessionsData = allSessionsData;
                 
@@ -481,8 +480,7 @@
 
         async function viewDetails(sessionId) {
             try {
-                // UPDATED: Removed http://localhost:5000
-                const reportResponse = await fetch(`/api/report/${sessionId}`);
+                const reportResponse = await fetch(`http://localhost:5000/api/report/${sessionId}`);
                 const report = await reportResponse.json();
 
                 const modal = document.getElementById('detailsModal');
@@ -547,8 +545,7 @@
         async function lockSession(sessionId) {
             if (!confirm('Are you sure you want to lock this assessment?')) return;
             
-            // UPDATED: Removed http://localhost:5000
-            await fetch(`/api/intervention/${sessionId}`, {
+            await fetch(`http://localhost:5000/api/intervention/${sessionId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'lock' })
@@ -560,8 +557,7 @@
         async function unlockSession(sessionId) {
             if (!confirm('Unlock this assessment?')) return;
             
-            // UPDATED: Removed http://localhost:5000
-            await fetch(`/api/intervention/${sessionId}`, {
+            await fetch(`http://localhost:5000/api/intervention/${sessionId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'unlock' })
