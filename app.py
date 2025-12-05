@@ -58,8 +58,8 @@ def dashboard():
 
 # Demo users 
 DEMO_USERS = {
-    'student': {'password': 'password', 'role': 'student', 'name': 'Vedika'},
-    'proctor': {'password': 'admin123', 'role': 'proctor', 'name': 'Vishnukeerthy'},
+    'Vedika': {'password': 'vedika123', 'role': 'student', 'name': 'Vedika'},
+    'Vishnukeerthy': {'password': 'vkr123', 'role': 'proctor', 'name': 'Vishnukeerthy'},
     'Abhinav': {'password': 'Abhinav123', 'role': 'student', 'name': 'Abhinav'},
     'Keertan': {'password': 'Keertan123', 'role': 'student', 'name': 'Keertan'}
 }
