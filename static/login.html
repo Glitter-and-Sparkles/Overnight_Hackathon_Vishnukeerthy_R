@@ -1,43 +1,379 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Behavioral Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Behavioral Analytics System</title>
     <style>
+        /* Color Palette Applied:
+           - Fresh Sky: #00A6FB
+           - Steel Blue: #0582CA
+           - Baltic Blue: #006494
+           - Deep Space Blue: #003554
+           - Ink Black: #051923
+        */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Background: Deep Space Blue to Ink Black */
+            background: linear-gradient(135deg, #003554 0%, #051923 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
         }
-        .container {
+
+        .login-container {
             background: white;
-            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); /* Slightly darker shadow for contrast */
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .login-left {
+            /* Gradient: Steel Blue to Baltic Blue */
+            background: linear-gradient(135deg, #0582CA 0%, #006494 100%);
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-left h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .login-left p {
+            font-size: 18px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .feature-list {
+            margin-top: 30px;
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .login-right {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-right h2 {
+            color: #051923; /* Ink Black */
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .role-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        a {
-            display: block;
-            margin: 20px 0;
-            padding: 15px 30px;
-            background: #667eea;
+
+        .role-card:hover {
+            border-color: #00A6FB; /* Fresh Sky */
+            background: #f0fbff; /* Very light tint of Fresh Sky */
+        }
+
+        .role-card.active {
+            border-color: #0582CA; /* Steel Blue */
+            background: #0582CA;  /* Steel Blue */
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 18px;
         }
-        a:hover {
-            background: #5568d3;
+
+        .role-card .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .role-card h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .role-card p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #003554; /* Deep Space Blue */
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00A6FB; /* Fresh Sky */
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            /* Gradient: Fresh Sky to Baltic Blue */
+            background: linear-gradient(135deg, #00A6FB 0%, #006494 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            /* Glow using Fresh Sky */
+            box-shadow: 0 5px 20px rgba(0, 166, 251, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .demo-credentials {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            border-left: 4px solid #006494; /* Baltic Blue accent */
+        }
+
+        .demo-credentials h4 {
+            margin-bottom: 10px;
+            color: #006494; /* Baltic Blue */
+        }
+
+        .demo-credentials p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #e6fff9;
+            color: #006494;
+            border: 1px solid #00A6FB;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+            .login-left {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛡️ Behavioral Analytics System</h1>
-        <p>Academic Integrity Monitoring</p>
-        <a href="/assessment">Take Assessment</a>
-        <a href="/dashboard">View Dashboard</a>
+    <div class="login-container">
+        <div class="login-left"><div style="margin-bottom: 30px;">
+        <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M75 35 C 75 25, 68 20, 60 20 C 50 20, 48 30, 52 45 L 62 80 C 66 95, 62 105, 50 105 C 40 105, 35 95, 38 85 C 39 82, 36 80, 33 82 C 30 85, 28 95, 35 108 C 42 120, 60 120, 72 105 L 82 70 C 86 55, 90 45, 88 35 C 87 30, 82 28, 80 30" 
+                  fill="white" />
+            
+            <text x="85" y="95" 
+                  font-family="'Brush Script MT', 'Segoe Script', 'Lucas Handwriting', cursive" 
+                  font-size="80" 
+                  fill="white"
+                  style="text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">itty</text>
+        </svg>
     </div>
+            <h1>Integritty</h1>
+            <p>Behavioral analytics for maintaining academic integrity in online assessments.</p>
+            
+            <ul class="feature-list">
+                <li>✓ Real-time behavioral monitoring</li>
+                <li>✓ ML-powered anomaly detection</li>
+                <li>✓ Privacy-compliant tracking</li>
+                <li>✓ Automated intervention system</li>
+                <li>✓ Comprehensive analytics dashboard</li>
+            </ul>
+        </div>
+
+        <div class="login-right">
+            <h2>Welcome Back</h2>
+
+            <div id="alert" class="alert"></div>
+
+            <div class="role-selector">
+                <div class="role-card" id="studentRole" onclick="selectRole('student')">
+                    <div class="icon">👨‍🎓</div>
+                    <h3>Student</h3>
+                    <p>Take Assessment</p>
+                </div>
+                <div class="role-card" id="proctorRole" onclick="selectRole('proctor')">
+                    <div class="icon">👨‍🏫</div>
+                    <h3>Proctor</h3>
+                    <p>Monitor & Analyze</p>
+                </div>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">Login</button>
+            </form>
+
+            <div class="demo-credentials">
+                <h4>Demo Credentials:</h4>
+                <p><strong>Student:</strong> Vedika / vedika123</p>
+                <p><strong>Proctor:</strong> Vishnukeerthy / vkr123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRole = 'student';
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            document.getElementById('studentRole').classList.remove('active');
+            document.getElementById('proctorRole').classList.remove('active');
+            
+            if (role === 'student') {
+                document.getElementById('studentRole').classList.add('active');
+            } else {
+                document.getElementById('proctorRole').classList.add('active');
+            }
+        }
+
+        // Default select student
+        selectRole('student');
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Disable button
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.textContent = 'Logging in...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        role: selectedRole
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store user info in localStorage
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showAlert('success', 'Login successful! Redirecting...');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (data.user.role === 'proctor') {
+                            window.location.href = '/dashboard';
+                        } else {
+                            window.location.href = '/assessment';
+                        }
+                    }, 1000);
+                } else {
+                    showAlert('error', data.message || 'Invalid credentials');
+                    btn.disabled = false;
+                    btn.textContent = 'Login';
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Login';
+            }
+        });
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = 'alert alert-' + type;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+    </script>
 </body>
 </html>
