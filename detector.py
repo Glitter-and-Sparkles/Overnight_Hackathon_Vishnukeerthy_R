@@ -12,7 +12,7 @@ class BehavioralDetector:
     def calculate_risk_score(self, session_data):
         """Calculate comprehensive risk score using multiple behavioral signals"""
         
-        risk_score = 0
+        risk_score = -10 #start with negative base score to prevent false positives
         risk_factors = []
         severity = 'low'
         
@@ -91,7 +91,7 @@ class BehavioralDetector:
         durations = [e.get('duration', 0) for e in blur_events]
         if durations:
             avg_duration = np.mean(durations)
-            if avg_duration > 30000:  # 30 seconds
+            if avg_duration > 60000:  # 1 minute
                 score += 20
                 factors.append(f'Prolonged window absence: avg {round(avg_duration/1000)}s')
         
@@ -166,7 +166,7 @@ class BehavioralDetector:
                 factors.append('Suspiciously low error rate (possible copy-paste)')
             
             # Too many backspaces might be cheating and correcting
-            if backspace_ratio > 0.3:
+            if backspace_ratio > 0.4:
                 score += 8
                 factors.append('High correction rate (unusual editing pattern)')
         
@@ -229,8 +229,8 @@ class BehavioralDetector:
                     score += 25
                     factors.append(f'Suspiciously fast completion: {round(elapsed/60, 1)} minutes')
                 
-                # Idle for too long (more than 30 minutes)
-                if elapsed > 1800:
+                # Idle for too long (more than 15 minutes)
+                if elapsed > 900:
                     score += 10
                     factors.append('Extended idle time detected')
             except:
