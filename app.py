@@ -5,12 +5,14 @@ import json
 import os
 import sys
 
+
 sys.path.append(os.path.dirname(__file__))
 from detector import BehavioralDetector
 
 app = Flask(__name__)
 CORS(app)
 
+# Initialize ML 
 detector = BehavioralDetector()
 
 # Store behavioral data
@@ -21,7 +23,7 @@ def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
-            
+        
             for session_id, session in data.items():
                 if 'interventions' not in session:
                     session['interventions'] = []
@@ -40,7 +42,11 @@ sessions = load_data()
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('static', 'login.html')
+
+@app.route('/login')
+def login_page():
+    return send_from_directory('static', 'login.html')
 
 @app.route('/assessment')
 def assessment():
@@ -49,6 +55,39 @@ def assessment():
 @app.route('/dashboard')
 def dashboard():
     return send_from_directory('static', 'dashboard.html')
+
+# Demo users 
+DEMO_USERS = {
+    'Vedika': {'password': 'vedika123', 'role': 'student', 'name': 'Vedika'},
+    'Vishnukeerthy': {'password': 'vkr123', 'role': 'proctor', 'name': 'Vishnukeerthy'},
+    'Abhinav': {'password': 'Abhinav123', 'role': 'student', 'name': 'Abhinav'},
+    'Keertan': {'password': 'Keertan123', 'role': 'student', 'name': 'Keertan'}
+}
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    role = data.get('role')
+    
+    # Check credentials
+    if username in DEMO_USERS:
+        user = DEMO_USERS[username]
+        if user['password'] == password and user['name'] == username:
+            return jsonify({
+                'success': True,
+                'user': {
+                    'username': username,
+                    'name': user['name'],
+                    'role': user['role']
+                }
+            })
+    
+    return jsonify({
+        'success': False,
+        'message': 'Invalid username, password, or role'
+    })
 
 @app.route('/api/session/start', methods=['POST'])
 def start_session():
@@ -59,6 +98,8 @@ def start_session():
         'session_id': session_id,
         'start_time': datetime.now().isoformat(),
         'user_id': data.get('user_id', 'anonymous'),
+        'user_name': data.get('username', 'name'),
+        'role': data.get('role', 'student'),
         'mouse_events': [],
         'keyboard_events': [],
         'window_events': [],
@@ -202,7 +243,7 @@ def get_ml_risk_score(session_id):
     
     session = sessions[session_id]
     
-   
+    # Use ML 
     risk_analysis = detector.calculate_risk_score(session)
     
     # Check for interventions
@@ -211,7 +252,7 @@ def get_ml_risk_score(session_id):
         risk_analysis['severity']
     )
     
-    # Ensure interventions key exists for previous ssessions
+    # Ensure interventions key exists (for old sessions)
     if 'interventions' not in session:
         session['interventions'] = []
     
@@ -221,7 +262,7 @@ def get_ml_risk_score(session_id):
             if intervention not in session['interventions']:
                 session['interventions'].append(intervention)
                 
-                # Lock session if suspicious
+                # Lock assessment if very suspicious
                 if intervention.get('action') == 'immediate_lock':
                     session['locked'] = True
     
@@ -270,12 +311,13 @@ def get_sessions():
     print(f"DEBUG: Total sessions in memory: {len(sessions)}")
     session_summary = {}
     for sid, data in sessions.items():
-        # Get risk score
+        # Get ML risk score
         risk_data = get_ml_risk_score(sid)
         print(f"DEBUG: Session {sid[:10]} - Risk: {risk_data['risk_score']}, Severity: {risk_data['severity']}")
         
         session_summary[sid] = {
             'user_id': data['user_id'],
+            'user_name': data.get('user_name', 'Unknown'),
             'start_time': data['start_time'],
             'event_counts': {
                 'mouse': len(data['mouse_events']),
