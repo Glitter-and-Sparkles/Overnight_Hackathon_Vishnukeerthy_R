@@ -61,7 +61,7 @@ DEMO_USERS = {
     'Vedika': {'password': 'vedika123', 'role': 'student', 'name': 'Vedika'},
     'Vishnukeerthy': {'password': 'vkr123', 'role': 'proctor', 'name': 'Vishnukeerthy'},
     'Abhinav': {'password': 'Abhinav123', 'role': 'student', 'name': 'Abhinav'},
-    'Keertan': {'password': 'Keertan123', 'role': 'student', 'name': 'Keertan'}
+    'Keertan': {'password': 'Keertan123', 'role': 'proctor', 'name': 'Keertan'}
 }
 
 @app.route('/api/login', methods=['POST'])
